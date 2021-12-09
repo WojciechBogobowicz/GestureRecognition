@@ -1,12 +1,12 @@
-import cv2
 import mediapipe as mp
-import time
 import numpy as np
+import cv2
+
 
 class HandDetector():
     def __init__(self, 
                 static_image_mode = False,
-                max_num_hands = 2,
+                max_num_hands = 1,
                 min_detection_confidence = 0.5,
                 #min_tracking_confidence = 0.5
             ) -> None:
@@ -45,29 +45,7 @@ class HandDetector():
         return hands_list
 
 
-def main():
-    hand_detector = HandDetector()
-    pTime = 0 #previous
-    cTime = 0 #current
-    cap = cv2.VideoCapture(0)
-
-    while True:    
-        succes, img = cap.read()
-        
-
-        print(hand_detector.find_hands(img))
-        
-        cTime = time.time()
-        fps = 1/(cTime-pTime)
-        pTime = cTime
-
-
-        cv2.putText(img, str(int(fps)), (10,70), cv2.FONT_HERSHEY_PLAIN,3, (255,0,255),3) #10,70 to pozycja tekstu, 2 to skala, (255,0,255) to kolor, 3 to grubość 
-
-
-        cv2.imshow("Image", img)
-        cv2.waitKey(1)
 
 
 if __name__ == "__main__":
-    main()
+    pass
