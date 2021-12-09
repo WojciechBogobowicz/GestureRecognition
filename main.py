@@ -1,10 +1,59 @@
 from HandTrackingModule import HandDetector
 from Keyboard import Keyboard, Key
+from traceback import format_exc
 import cv2
 import time
 
 
 
+
+class GestureSaver:
+    def __init__(self, file, gesture_name: str, need_to_capture: int) -> None:
+        self._file = file
+        self._is_recording = False
+        self._gesture_name = gesture_name
+        self._captured_count = 0
+        self._need_to_capture = need_to_capture
+
+    def capture_hand_landmarks_if_recording(self, hands_landmarks, hand_num) -> None:
+        if self._is_recording:
+                if hands_landmarks:
+                    hands_landmark_strings = [f"{x},{y}" for x, y in hands_landmarks[0]]
+                    self._file.write(";".join(hands_landmark_strings))
+                    self._file.write(f";{self._gesture_name}\n")                      
+                    self._captured_count += 1
+
+    def all_images_are_captured(self) -> bool:
+        if self._captured_count == self._need_to_capture:
+            return True
+        if self._captured_count > self._need_to_capture:
+            raise ValueError(f"{format_exc} Too many gestures were captured.")
+        return False
+
+    @property
+    def is_recording(self):
+        return self._is_recording
+
+    def start_recoding(self):
+        self._is_recording = True
+
+    def end_recording(self):
+        self._is_recording = False
+
+
+class Flag:
+        def __init__(self) -> None:
+            self._status = False
+    
+        @property
+        def status(self) -> bool:
+            return self._status
+        
+        def rise(self):
+            self._status = True
+
+        def drop(self):
+            self._status = False
 
 
 def main():
@@ -15,19 +64,6 @@ def main():
 
 
     ######### rzeczy do pliku ########
-    class Flag:
-        def __init__(self) -> None:
-            self._status = False
-        
-        @property
-        def status(self) -> bool:
-            return self._status
-        
-        def rise(self):
-            self._status = True
-
-        def drop(self):
-            self._status = False
 
     recording_flag = Flag()
     gesture_name = "OpenHand"
