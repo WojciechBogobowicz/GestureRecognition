@@ -8,8 +8,20 @@ class GestureSaver:
         self._gesture_name = gesture_name
         self._captured_count = 0
         self._need_to_capture = need_to_capture
+    
+    def __str__(self) -> str:
+        if self._is_recording:
+            return f"Recording.. {self.gesture_name}"
+        else:
+            return f"Ready for {self.gesture_name}"
 
-    def capture_hand_landmarks(self, hands_landmarks, hand_num=0) -> None:
+    def save_hand_landmarks_if_recording(self, hands_landmarks, hand_num=0) -> None:
+        if self._is_recording:
+            self.save_hand_landmarks(hands_landmarks, hand_num)
+
+    def save_hand_landmarks(self, hands_landmarks, hand_num=0) -> None:
+        if not self._is_recording:
+            raise RuntimeError(f"{format_exc} You can save landmarks only during recording.")
         if hands_landmarks:
             hands_landmark_strings = [f"{x},{y}" for x, y in hands_landmarks[hand_num]]
             self._file.write(";".join(hands_landmark_strings))
@@ -18,10 +30,12 @@ class GestureSaver:
 
     def all_images_are_captured(self) -> bool:
         if self._captured_count == self._need_to_capture:
+            self.end_recording()
             return True
         if self._captured_count > self._need_to_capture:
             raise ValueError(f"{format_exc} Too many gestures were captured.")
         return False
+    
 
     @property
     def gesture_name(self):
