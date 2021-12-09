@@ -1,3 +1,6 @@
+from traceback import format_exc
+
+
 class GestureSaver:
     def __init__(self, file, gesture_name: str, need_to_capture: int) -> None:
         self._file = file
@@ -19,6 +22,16 @@ class GestureSaver:
         if self._captured_count > self._need_to_capture:
             raise ValueError(f"{format_exc} Too many gestures were captured.")
         return False
+
+    @property
+    def gesture_name(self):
+        return self._gesture_name
+
+    @gesture_name.setter
+    def gesture_name(self, new_name: str):
+        if self.is_recording:
+            raise RuntimeError(f"{format_exc} You cannot change gesture name during recording.")
+        self.gesture_name = new_name
 
     @property
     def is_recording(self):
